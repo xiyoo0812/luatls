@@ -7,6 +7,20 @@ TARGET_NAME = luatls
 #系统环境
 UNAME_S = $(shell uname -s)
 
+#编译器
+ifneq (,$(findstring clang++, $(CXX)))
+    COMPILER := clang
+else ifneq (,$(findstring g++, $(CXX)))
+    COMPILER := gcc
+else
+    COMPILER := unknown
+endif
+
+$(info ==============================================)
+$(info PROJECT: $(PROJECT_NAME))
+$(info OS: $(UNAME_S) Compiler: $(COMPILER) ($(CXX)))
+$(info ==============================================)
+
 #伪目标
 .PHONY: clean all target pre_build post_build
 all : pre_build target post_build
@@ -32,6 +46,7 @@ STDCPP = -std=c++20
 
 #需要的include目录
 MYCFLAGS += -I./src/include
+MYCFLAGS += -I./src/library
 MYCFLAGS += -I../lua/lua
 MYCFLAGS += -I../luakit/include
 
@@ -112,8 +127,6 @@ SOURCES += src/library/cmac.c
 SOURCES += src/library/constant_time.c
 SOURCES += src/library/ctr_drbg.c
 SOURCES += src/library/debug.c
-SOURCES += src/library/des.c
-SOURCES += src/library/dhm.c
 SOURCES += src/library/ecdh.c
 SOURCES += src/library/ecdsa.c
 SOURCES += src/library/ecjpake.c
@@ -124,10 +137,10 @@ SOURCES += src/library/entropy.c
 SOURCES += src/library/entropy_poll.c
 SOURCES += src/library/error.c
 SOURCES += src/library/gcm.c
-SOURCES += src/library/hkdf.c
 SOURCES += src/library/hmac_drbg.c
 SOURCES += src/library/lmots.c
 SOURCES += src/library/lms.c
+SOURCES += src/library/mbedtls_config.c
 SOURCES += src/library/md.c
 SOURCES += src/library/md5.c
 SOURCES += src/library/memory_buffer_alloc.c
@@ -136,12 +149,11 @@ SOURCES += src/library/mps_trace.c
 SOURCES += src/library/net_sockets.c
 SOURCES += src/library/nist_kw.c
 SOURCES += src/library/oid.c
-SOURCES += src/library/padlock.c
 SOURCES += src/library/pem.c
 SOURCES += src/library/pk.c
 SOURCES += src/library/pk_ecc.c
+SOURCES += src/library/pk_rsa.c
 SOURCES += src/library/pk_wrap.c
-SOURCES += src/library/pkcs12.c
 SOURCES += src/library/pkcs5.c
 SOURCES += src/library/pkcs7.c
 SOURCES += src/library/pkparse.c
@@ -160,7 +172,6 @@ SOURCES += src/library/psa_crypto_hash.c
 SOURCES += src/library/psa_crypto_mac.c
 SOURCES += src/library/psa_crypto_pake.c
 SOURCES += src/library/psa_crypto_rsa.c
-SOURCES += src/library/psa_crypto_se.c
 SOURCES += src/library/psa_crypto_slot_management.c
 SOURCES += src/library/psa_crypto_storage.c
 SOURCES += src/library/psa_its_file.c
@@ -186,6 +197,8 @@ SOURCES += src/library/ssl_tls13_client.c
 SOURCES += src/library/ssl_tls13_generic.c
 SOURCES += src/library/ssl_tls13_keys.c
 SOURCES += src/library/ssl_tls13_server.c
+SOURCES += src/library/tf_psa_crypto_config.c
+SOURCES += src/library/tf_psa_crypto_version.c
 SOURCES += src/library/threading.c
 SOURCES += src/library/timing.c
 SOURCES += src/library/version.c
@@ -195,6 +208,7 @@ SOURCES += src/library/x509_create.c
 SOURCES += src/library/x509_crl.c
 SOURCES += src/library/x509_crt.c
 SOURCES += src/library/x509_csr.c
+SOURCES += src/library/x509_oid.c
 SOURCES += src/library/x509write.c
 SOURCES += src/library/x509write_crt.c
 SOURCES += src/library/x509write_csr.c
@@ -229,6 +243,7 @@ clean :
 pre_build:
 	mkdir -p $(INT_DIR)
 	mkdir -p $(TARGET_DIR)
+	mkdir -p $(SOLUTION_DIR)library
 	mkdir -p $(INT_DIR)/src
 	mkdir -p $(INT_DIR)/src/extend
 	mkdir -p $(INT_DIR)/src/library
